@@ -34,7 +34,7 @@ bumper = np.array([[20,250],
 plt.close()
 fig1 = plt.figure()
 ax1 = fig1.add_subplot(111, aspect='equal')
-plt.axis([0,1000,0,1000])
+plt.axis([-1000,1000,-1000,1000])
 
 body_obj = ax1.add_patch(patches.Polygon(body, color='gray'))
 wheel1_obj = ax1.add_patch(patches.Polygon(wheel1, color='goldenrod'))
@@ -50,15 +50,18 @@ def init():
 
 def animate(i):
     t = np.eye(3)
-    t[1,2] = 10
+    t[1,2] = 5
     for obj in objs:
-        obj.set_transform(transforms.Affine2D(np.dot(t,obj.get_transform().get_matrix())))
+        obj.set_transform(transforms.Affine2D(np.dot(t, obj.get_transform().get_matrix())))
     return
 
     
 anim = FuncAnimation(fig1, animate, init_func=init,
                                frames=50, interval=10, repeat = False, blit=False)
 
+
+
+plt.draw()
 
 
 
