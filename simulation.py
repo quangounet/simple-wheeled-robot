@@ -2,8 +2,19 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib import patches
-from matplotlib import transforms
-from time import sleep
+
+
+def affine_transform(t, points):
+    points1 = []
+    for x in points:
+        v = np.array([0,0,1])
+        v[:2] = x
+        points1.append(np.dot(t, v)[:2])
+    return points1
+
+def init():
+    print("Start")
+
 
 
 body = np.array([[20,0],
@@ -35,6 +46,7 @@ plt.close()
 fig1 = plt.figure()
 ax1 = fig1.add_subplot(111, aspect='equal')
 plt.axis([-1000,1000,-1000,1000])
+plt.grid('on')
 
 body_obj = ax1.add_patch(patches.Polygon(body, color='gray'))
 wheel1_obj = ax1.add_patch(patches.Polygon(wheel1, color='goldenrod'))
@@ -44,68 +56,32 @@ wheel4_obj = ax1.add_patch(patches.Polygon(wheel4, color='goldenrod'))
 bumper_obj = ax1.add_patch(patches.Polygon(bumper, color='gray'))
 objs = [body_obj, wheel1_obj, wheel2_obj, wheel3_obj, wheel4_obj, bumper_obj]
 
+n = 1000
+dt = 0.1
+R = 100
+vl = n * [1]
+vr = n * [2]
 
-def init():
-    return
+
+x, y, theta = 0, 0, np.pi/2
+T = []
+for i in range(n):
+    T.append(np.array([[np.cos(theta-np.pi/2), -np.sin(theta-np.pi/2), x],
+                       [np.sin(theta-np.pi/2), np.cos(theta-np.pi/2), y],
+                       [0, 0, 1]]))
+    v = (vl[i] + vr[i])/2
+    omega = (-vl[i] + vr[i])/(2*R)
+    x += v*np.cos(theta)*dt
+    y += v*np.sin(theta)*dt
+    theta += omega*dt
+    
 
 def animate(i):
-    t = np.eye(3)
-    t[1,2] = 5
     for obj in objs:
-        obj.set_transform(transforms.Affine2D(np.dot(t, obj.get_transform().get_matrix())))
-    return
+        obj.set_xy(affine_transform(T[i], obj.get_xy()))
 
-    
 anim = FuncAnimation(fig1, animate, init_func=init,
                                frames=50, interval=10, repeat = False, blit=False)
 
 
-
-plt.draw()
-
-
-
-
-
-def init():
-    artists.append(ax1.add_patch(patches.Polygon(body)))
-    artists.append(ax1.add_patch(patches.Polygon(wheel1)))
-    artists.append(ax1.add_patch(patches.Polygon(wheel2)))
-    artists.append(ax1.add_patch(patches.Polygon(wheel3)))
-    artists.append(ax1.add_patch(patches.Polygon(wheel4)))
-    artists.append(ax1.add_patch(patches.Polygon(bumper)))
-    return artists
-
-def animate(i):
-    artists[0]=ax1.add_patch(patches.Polygon(body+10*i))
-    artists[1]=ax1.add_patch(patches.Polygon(wheel1))
-    artists[2]=ax1.add_patch(patches.Polygon(wheel2))
-    artists[3]=ax1.add_patch(patches.Polygon(wheel3))
-    artists[4]=ax1.add_patch(patches.Polygon(wheel4))
-    artists[5]=ax1.add_patch(patches.Polygon(bumper))
-
-anim = FuncAnimation(fig1, animate, init_func=init,
-                               frames=5, interval=20, blit=True)
-
-
-
-
-
-
-fig = plt.figure()
-ax = plt.axes(xlim=(0, 4), ylim=(-2, 2))
-line, = ax.plot([], [], lw=3)
-
-def init():
-    line.set_data([], [])
-    return line,
-
-def animate(i):
-    x = np.linspace(0, 4, 1000)
-    y = np.sin(2 * np.pi * (x - 0.01 * i))
-    line.set_data(x, y)
-    return line,
-
-anim = FuncAnimation(fig, animate, init_func=init,
-                               frames=200, interval=20, blit=True)
 
