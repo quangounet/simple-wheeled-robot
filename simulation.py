@@ -1,7 +1,9 @@
+#! /usr/bin/env python
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib import patches
+from IPython import embed
 
 def rotation_matrix(theta):
     return np.array([[np.cos(theta), -np.sin(theta)],
@@ -21,7 +23,7 @@ for i in range(n):
     pv.append(np.array([x, y]))
     thetav.append(theta)
     v = (vl[i] + vr[i])/2
-    omega = (-vl[i] + vr[i])/L
+    omega = float(-vl[i] + vr[i])/L
     x -= v*np.sin(theta)*dt
     y += v*np.cos(theta)*dt
     theta += omega*dt
@@ -75,6 +77,6 @@ def animate(i):
         objs[j].set_xy(points)
 
 anim = FuncAnimation(fig, animate, frames=n, interval=dt*1000, repeat = False, blit=False)
-
-
-
+plt.show(block = False)
+embed()
+exit(0)
