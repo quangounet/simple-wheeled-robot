@@ -4,42 +4,37 @@ from matplotlib.animation import FuncAnimation
 from matplotlib import patches
 
 
-def affine_transform(t, points):
-    points1 = []
-    for x in points:
-        v = np.array([0,0,1])
-        v[:2] = x
-        points1.append(np.dot(t, v)[:2])
-    return points1
-
 def init():
     print("Start")
 
 
-
+p0 = np.array([91, 185])
+theta0 = 0
 body = np.array([[20,0],
                [162,0],
                [162,250],
-               [20,250]])
+               [20,250]]) - p0
 wheel1 = np.array([[0,25],
                    [20,25],
                    [20,105],
-                   [0,105]])
+                   [0,105]]) - p0
 wheel2 = np.array([[162,25],
                    [182,25],
                    [182,105],
-                   [162,105]])
+                   [162,105]]) - p0
 wheel3 = np.array([[0,145],
                    [20,145],
                    [20,225],
-                   [0,225]])
+                   [0,225]]) - p0
 wheel4 = np.array([[162,145],
                    [182,145],
                    [182,225],
-                   [162,225]])
+                   [162,225]]) - p0
 bumper = np.array([[20,250],
                    [162,250],
-                   [91,300]])
+                   [91,300]]) - p0
+
+points0 = [body, wheel1, wheel2, wheel3, wheel4, bumper]
 
 
 plt.close()
@@ -59,26 +54,31 @@ objs = [body_obj, wheel1_obj, wheel2_obj, wheel3_obj, wheel4_obj, bumper_obj]
 n = 1000
 dt = 0.1
 R = 100
-vl = n * [1]
-vr = n * [2]
+vl = n * [150]
+vr = n * [200]
 
-
-x, y, theta = 0, 0, np.pi/2
-T = []
+x, y, theta = 0, 0, theta0
+pv, thetav = [], []
 for i in range(n):
-    T.append(np.array([[np.cos(theta-np.pi/2), -np.sin(theta-np.pi/2), x],
-                       [np.sin(theta-np.pi/2), np.cos(theta-np.pi/2), y],
-                       [0, 0, 1]]))
+    pv.append(np.array([x, y]))
+    thetav.append(theta)
     v = (vl[i] + vr[i])/2
     omega = (-vl[i] + vr[i])/(2*R)
-    x += v*np.cos(theta)*dt
-    y += v*np.sin(theta)*dt
+    x -= v*np.sin(theta)*dt
+    y += v*np.cos(theta)*dt
     theta += omega*dt
-    
+
+def rotation_matrix(theta):
+    return np.array([[np.cos(theta), -np.sin(theta)],
+                     [np.sin(theta), np.cos(theta)]])
 
 def animate(i):
-    for obj in objs:
-        obj.set_xy(affine_transform(T[i], obj.get_xy()))
+    for j in range(len(points0)):
+        points = []
+        for p in points0[j]:
+            p1 = np.dot(rotation_matrix(thetav[i]), p) + pv[i]
+            points.append(p1)
+        objs[j].set_xy(points)
 
 anim = FuncAnimation(fig1, animate, init_func=init,
                                frames=50, interval=10, repeat = False, blit=False)
