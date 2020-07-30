@@ -10,8 +10,8 @@ Prerequisite configurations to enable SSH on the Pi and connect it to the intern
 - Choose the SD card you wish to write your image to.
 - Review your selections and click 'WRITE' to begin writing data to the SD card.
 - Navigate to the `boot` folder of the SD card
-  - Creat an empty file named `ssh`.
-  - If you want to access to the Pi via wifi and connect it to the internect, creat `wpa_supplicant.conf`, and paste the following into the file (modify `ssid` and `psk` accordingly)
+  - Create an empty file named `ssh`.
+  - If you want to access to the Pi via wifi and connect it to the internect, create `wpa_supplicant.conf`, and paste the following into the file (modify `ssid` and `psk` accordingly)
   ```
     country=SG
     ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
@@ -23,10 +23,10 @@ Prerequisite configurations to enable SSH on the Pi and connect it to the intern
     psk="your_wifi_password"
     }
     ```
+    * Note: This does not support public wifi that requires you to input user name & password. Ethernet connection is required in this case. *
 - Insert the SD card to the Raspberry Pi
 
-*The following has been tested to work on a Ubuntu 16.04 laptop. 
-Need to test with Windows if the robot is to be controlled with the desktops in the lab.*
+*The following has been tested to work on Ubuntu 16.04, macOS Mojave and Windows 10 laptop (with Wifi), as well as Windows 10 desktop (no Wifi).*
 
 ## Access the Raspberry Pi 
 Raspberry Pi 4 has two micro HDMI ports and several USB ports, allowing you to access it with external monitor, keyboard and mouse.
@@ -39,8 +39,10 @@ Default Username and Password for the Pi is:
 - username: pi
 - password: raspberry
 
+*Upon first login to the Pi, you may be reminded to change the username and password.*
+
 ### Access the Raspberry Pi with SSH
-- Edit network connection if the Pi is connected to your computer via *Ethernet cable*:
+- Edit network connection only if the Pi is connected to your computer via *Ethernet cable* and your computer accesses the internet with Wifi:
   - Go to `Edit connections...`.
   - Navigate to `IPv4 Settings` tab. Select Method: `Shared to other computers`.
   - Save the connection.
