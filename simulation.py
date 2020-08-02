@@ -3,7 +3,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib import patches
-from IPython import embed
 
 def rotation_matrix(theta):
   return np.array([[np.cos(theta), -np.sin(theta)],
@@ -11,25 +10,34 @@ def rotation_matrix(theta):
 
 
 # Kinematics (simple differential drive model)   
-T = 5 # Simulation time in s
+T = 3 # Simulation time in s
 dt = 0.1 # Simulation timestep in s
 n = int(T/dt) 
-L = 128 # Front axis length in mm
-vl = n * [150] # Left wheel linear velocity in mm/s
-vr = n * [200] # Right wheel linear velocity in mm/s
+L = 130 # Front axis length in mm
+vm_off = -280.0/3  # actual robot velocity offset in mm/s 
+scale = 10    # mapping factor between motor speed and wheel linear velocity
+NEG = True   # whether car motion in backward
+vml = np.array(n * [40])  # left motor commanded speed (speed range: 20 - 100)
+vmr = np.array(n * [40])  # right motor commanded speed (speed range: 20 - 100)
+vl = np.add(vml*scale, n * [vm_off]) # Left wheel linear velocity in mm/s
+vr = np.add(vmr*scale, n * [vm_off]) # Right wheel linear velocity in mm/s
+if NEG:
+  vl = -vl
+  vr = -vr
+
 x, y, theta = 0, 0, 0
 pv, thetav = [], []
 for i in range(n):
   pv.append(np.array([x, y]))
   thetav.append(theta)
   v = (vl[i] + vr[i])/2
-  omega = float(-vl[i] + vr[i])/L
+  omega = float(-vml[i] + vmr[i])/L*3
   x -= v*np.sin(theta)*dt
   y += v*np.cos(theta)*dt
   theta += omega*dt
 
 
-# Simulation (reference point is the middle of the front axis)
+# Simulation (reference point is the center of the car)
 body_points = np.array([[ -52, -105.5],
        [  52, -105.5],
        [  52,   105.5],
@@ -58,7 +66,7 @@ points0 = [body_points, wheel1_points, wheel2_points, wheel3_points, wheel4_poin
 plt.close()
 fig = plt.figure()
 ax = fig.add_subplot(111, aspect='equal')
-plt.axis([-1000,1000,-1000,1000])
+plt.axis([-2000,2000,-2000,2000])
 plt.grid('on')
 body_obj = ax.add_patch(patches.Polygon(body_points, color='gray'))
 wheel1_obj = ax.add_patch(patches.Polygon(wheel1_points, color='goldenrod'))
@@ -79,5 +87,3 @@ def animate(i):
 anim = FuncAnimation(fig, animate, frames=n, interval=dt*1000, repeat = False, blit=False)
 plt.ion()
 plt.show()
-embed()
-exit(0)
