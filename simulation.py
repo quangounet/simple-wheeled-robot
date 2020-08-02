@@ -78,5 +78,5 @@ def animate(i):
 
 anim = FuncAnimation(fig, animate, frames=n, interval=dt*1000, repeat = False, blit=False)
 plt.show(block = False)
-embed()
-exit(0)
+#embed()
+#exit(0)
